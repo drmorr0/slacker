@@ -187,8 +187,8 @@ class Users(BaseAPI):
     def info(self, user):
         return self.get('users.info', params={'user': user})
 
-    def list(self, presence=False):
-        return self.get('users.list', params={'presence': int(presence)})
+    def list(self, cursor=None, limit=None, presence=False):
+        return self.get('users.list', params={'cursor': cursor, 'limit': limit, 'presence': int(presence)})
 
     def identity(self):
         return self.get('users.identity')
@@ -355,22 +355,23 @@ class Chat(BaseAPI):
             if isinstance(attachments, list):
                 attachments = json.dumps(attachments)
 
-        return self.post('chat.postMessage',
-                         data={
-                             'channel': channel,
-                             'text': text,
-                             'username': username,
-                             'as_user': as_user,
-                             'parse': parse,
-                             'link_names': link_names,
-                             'attachments': attachments,
-                             'unfurl_links': unfurl_links,
-                             'unfurl_media': unfurl_media,
-                             'icon_url': icon_url,
-                             'icon_emoji': icon_emoji,
-                             'thread_ts': thread_ts,
-                             'reply_broadcast': reply_broadcast
-                         })
+        data = {
+             'channel': channel,
+             'text': text,
+             'username': username,
+             'as_user': as_user,
+             'parse': parse,
+             'link_names': link_names,
+             'attachments': attachments,
+             'unfurl_links': unfurl_links,
+             'unfurl_media': unfurl_media,
+             'icon_url': icon_url,
+             'icon_emoji': icon_emoji,
+             'reply_broadcast': reply_broadcast
+        }
+        if thread_ts:
+            data['thread_ts'] = thread_ts
+        return self.post('chat.postMessage', data=data)
 
     def me_message(self, channel, text):
         return self.post('chat.meMessage',
